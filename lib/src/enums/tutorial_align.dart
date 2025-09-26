@@ -1,6 +1,9 @@
 import 'package:tutorial_coach_mark/tutorial_coach_mark.dart';
 
 sealed class TutorialAlign {
+  const TutorialAlign._({required ContentAlign contentAlign})
+      : _contentAlign = contentAlign;
+
   static TutorialAlign get bottom => const _TutorialAlignBottom();
 
   static TutorialAlign get left => const _TutorialAlignLeft();
@@ -10,9 +13,6 @@ sealed class TutorialAlign {
   static TutorialAlign get top => const _TutorialAlignTop();
 
   final ContentAlign _contentAlign;
-
-  const TutorialAlign._({required ContentAlign contentAlign})
-      : _contentAlign = contentAlign;
 
   /// このパッケージしか使わない
   ContentAlign get contentAlign => _contentAlign;

@@ -15,9 +15,10 @@ dev_dependencies:
   flutter_lints: ^4.0.0
   flutter_test:
     sdk: flutter
+  very_good_analysis: any
 environment:
   flutter: ">=1.17.0"
   sdk: ">=3.4.0 <4.0.0"
 name: colaxy_tutorial
-publish_to: none
+repository: https://github.com/normidar/colaxy_tutorial
 version: 0.0.1

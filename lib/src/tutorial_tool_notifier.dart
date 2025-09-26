@@ -3,14 +3,15 @@ import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 
 class TutorialToolNotifier extends StatefulWidget {
-  final String title;
-  final Widget child;
-
   const TutorialToolNotifier({
     required this.title,
     required this.child,
     super.key,
   });
+
+  final String title;
+
+  final Widget child;
 
   @override
   State<TutorialToolNotifier> createState() => _TutorialToolNotifierState();
