@@ -6,8 +6,6 @@ import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:tutorial_coach_mark/tutorial_coach_mark.dart';
 
-const packageName = 'tutorial';
-
 class TutorialTool {
   static bool tutorialVisible = true;
 
