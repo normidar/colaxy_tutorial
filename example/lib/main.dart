@@ -185,48 +185,6 @@ class MainScreen extends StatelessWidget {
                 textStyle: const TextStyle(fontSize: 18),
               ),
             ),
-            const SizedBox(height: 32),
-            const Expanded(
-              child: Card(
-                child: Padding(
-                  padding: EdgeInsets.all(16.0),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        'Package Features:',
-                        style: TextStyle(
-                          fontSize: 18,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                      SizedBox(height: 12),
-                      FeatureItem(
-                        icon: Icons.school,
-                        title: 'Interactive Tutorials',
-                        description: 'Create step-by-step guided tutorials',
-                      ),
-                      FeatureItem(
-                        icon: Icons.lightbulb,
-                        title: 'Contextual Hints',
-                        description: 'Show targeted tips and information',
-                      ),
-                      FeatureItem(
-                        icon: Icons.history,
-                        title: 'Version Tracking',
-                        description: 'Track app versions and user progress',
-                      ),
-                      FeatureItem(
-                        icon: Icons.palette,
-                        title: 'Customizable',
-                        description:
-                            'Flexible styling and configuration options',
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-            ),
           ],
         ),
       ),
