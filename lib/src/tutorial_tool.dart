@@ -106,7 +106,7 @@ class TutorialTool {
         barrierDismissible: false,
         builder: (context) => TutorialToolNotifier(
           title: title,
-          showDontShowAgain: false,
+          showDontShowAgain: true,
           child: child,
         ),
       );
