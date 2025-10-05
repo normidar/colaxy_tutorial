@@ -9,86 +9,11 @@ import 'package:tutorial_coach_mark/tutorial_coach_mark.dart';
 class TutorialTool {
   static bool tutorialVisible = true;
 
-  static Future<bool> isFirstTime(String id) async {
-    final prefs = await SharedPreferences.getInstance();
-    final isFirstTime = prefs.getBool('$packageName:is_first_time:$id') ?? true;
-    if (isFirstTime) {
-      await prefs.setBool('$packageName:is_first_time:$id', false);
-      await prefs.setStringList(
-        '$packageName:is_first_time_ids',
-        <String>{
-          id,
-          ...(prefs.getStringList('$packageName:is_first_time_ids') ?? []),
-        }.toList(),
-      );
-    }
-    return isFirstTime;
-  }
-
   static Future<void> resetTutorial() async {
     final prefs = await SharedPreferences.getInstance();
     final showedIds = prefs.getStringList('$packageName:showed_ids') ?? [];
     for (final id in showedIds) {
       await prefs.remove('$packageName:$id');
-    }
-    final isFirstTimeIds =
-        prefs.getStringList('$packageName:is_first_time_ids') ?? [];
-    for (final id in isFirstTimeIds) {
-      await prefs.remove('$packageName:is_first_time:$id');
-    }
-  }
-
-  static Future<void> showColaxyDialog({
-    required String id,
-    required BuildContext buildContext,
-    required Widget child,
-    required String title,
-
-    /// 強制的に表示するかどうか。
-    bool forceShow = false,
-
-    /// バージョンが一致した場合にのみ表示する。
-    bool Function(String version)? anyChecker,
-
-    /// バージョンが一致した場合にのみ表示する。
-    bool Function(String version)? everyChecker,
-  }) async {
-    final key = 'tutorial_showed_$id';
-
-    final prefs = await SharedPreferences.getInstance();
-
-    if (!forceShow) {
-      if (anyChecker != null) {
-        final isRecorded = await VersionRecorder.isRecordedVersionOr(
-          checker: anyChecker,
-        );
-        if (!isRecorded) {
-          return;
-        }
-      }
-      if (everyChecker != null) {
-        final isRecorded = await VersionRecorder.isRecordedVersionAnd(
-          checker: everyChecker,
-        );
-        if (!isRecorded) {
-          return;
-        }
-      }
-
-      final showed = prefs.getBool(key) ?? false;
-      if (showed) {
-        return;
-      }
-    }
-    if (buildContext.mounted) {
-      final dontShowAgain = await showDialog<bool>(
-        context: buildContext,
-        barrierDismissible: false,
-        builder: (context) => TutorialToolNotifier(title: title, child: child),
-      );
-      if (dontShowAgain != null && dontShowAgain) {
-        await prefs.setBool(key, true);
-      }
     }
   }
 
@@ -154,15 +79,52 @@ class TutorialTool {
     Future.delayed(const Duration(milliseconds: 300), () async {
       if (buildContext.mounted) {
         tutorialCoachMark.show(context: buildContext);
-        for (final id in toShowIds) {
-          await prefs.setBool('$packageName:$id', true);
-        }
-        const key = '$packageName:showed_ids';
-        await prefs.setStringList(
-          key,
-          <String>{...toShowIds, ...(prefs.getStringList(key) ?? [])}.toList(),
-        );
+        await _saveShowedIds(toShowIds);
       }
     });
+  }
+
+  /// By condition maybe show or not.
+  static Future<void> showTutorialDialog({
+    required String id,
+    required BuildContext buildContext,
+    required Widget child,
+    required String title,
+  }) async {
+    final key = '$packageName:$id';
+
+    final prefs = await SharedPreferences.getInstance();
+
+    final showed = prefs.getBool(key) ?? false;
+    if (showed) {
+      return;
+    }
+
+    if (buildContext.mounted) {
+      final dontShowAgain = await showDialog<bool>(
+        context: buildContext,
+        barrierDismissible: false,
+        builder: (context) => TutorialToolNotifier(
+          title: title,
+          showDontShowAgain: false,
+          child: child,
+        ),
+      );
+      if (dontShowAgain ?? false) {
+        await _saveShowedIds([id]);
+      }
+    }
+  }
+
+  static Future<void> _saveShowedIds(List<String> ids) async {
+    final prefs = await SharedPreferences.getInstance();
+    for (final id in ids) {
+      await prefs.setBool('$packageName:$id', true);
+    }
+    const key = '$packageName:showed_ids';
+    await prefs.setStringList(
+      key,
+      <String>{...ids, ...(prefs.getStringList(key) ?? [])}.toList(),
+    );
   }
 }

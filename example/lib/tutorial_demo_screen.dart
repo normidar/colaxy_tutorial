@@ -220,7 +220,7 @@ class _TutorialDemoScreenState extends State<TutorialDemoScreen> {
   }
 
   Future<void> _showAdvancedDialog() async {
-    await TutorialTool.showColaxyDialog(
+    await TutorialTool.showTutorialDialog(
       id: 'advanced_feature_dialog',
       buildContext: context,
       title: '高度な機能',

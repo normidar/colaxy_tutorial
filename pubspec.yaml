@@ -8,7 +8,7 @@ dependencies:
   package_info_plus: ^8.1.1
   shared_preferences: ^2.2.3
   tutorial_coach_mark: ^1.2.12
-description: "'A app in Coin Galaxy.'"
+description: "A tool for showing tutorials."
 dev_dependencies:
   auto_exporter: any
   build_runner: ^2.4.11

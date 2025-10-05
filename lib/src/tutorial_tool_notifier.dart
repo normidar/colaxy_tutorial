@@ -6,6 +6,7 @@ class TutorialToolNotifier extends StatefulWidget {
   const TutorialToolNotifier({
     required this.title,
     required this.child,
+    required this.showDontShowAgain,
     super.key,
   });
 
@@ -13,12 +14,14 @@ class TutorialToolNotifier extends StatefulWidget {
 
   final Widget child;
 
+  final bool showDontShowAgain;
+
   @override
   State<TutorialToolNotifier> createState() => _TutorialToolNotifierState();
 }
 
 class _TutorialToolNotifierState extends State<TutorialToolNotifier> {
-  bool dontShowAgain = true;
+  bool dontShowAgain = false;
 
   @override
   Widget build(BuildContext context) {
@@ -26,23 +29,30 @@ class _TutorialToolNotifierState extends State<TutorialToolNotifier> {
       title: Text(widget.title),
       content: widget.child,
       actions: [
-        Row(
-          children: [
-            SizedBox(
-              width: 20,
-              height: 20,
-              child: Checkbox(
-                value: dontShowAgain,
-                onChanged: (value) {
-                  setState(() {
-                    dontShowAgain = value ?? false;
-                  });
-                },
-              ),
+        if (widget.showDontShowAgain)
+          GestureDetector(
+            onTap: () => setState(() {
+              dontShowAgain = !dontShowAgain;
+            }),
+            child: Row(
+              children: [
+                SizedBox(
+                  width: 20,
+                  height: 20,
+                  child: Checkbox(
+                    value: dontShowAgain,
+                    onChanged: (value) {
+                      setState(() {
+                        dontShowAgain = value ?? false;
+                      });
+                    },
+                  ),
+                ),
+                const SizedBox(width: 7),
+                Text('$packageName:dont_show_again'.tr()),
+              ],
             ),
-            Text('$packageName:dont_show_again'.tr()),
-          ],
-        ),
+          ),
         ElevatedButton(
           onPressed: () => Navigator.of(context).pop(dontShowAgain),
           child: Text(

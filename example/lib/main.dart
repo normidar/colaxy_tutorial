@@ -143,7 +143,7 @@ class MainScreen extends StatelessWidget {
             const SizedBox(height: 16),
             ElevatedButton.icon(
               onPressed: () async {
-                await TutorialTool.showColaxyDialog(
+                await TutorialTool.showTutorialDialog(
                   id: 'welcome_dialog',
                   buildContext: context,
                   title: 'Welcome Dialog',
