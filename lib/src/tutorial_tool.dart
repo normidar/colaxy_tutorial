@@ -90,6 +90,7 @@ class TutorialTool {
     required BuildContext buildContext,
     required Widget child,
     required String title,
+    required bool showDontShowAgain,
   }) async {
     final key = '$packageName:$id';
 
@@ -106,7 +107,7 @@ class TutorialTool {
         barrierDismissible: false,
         builder: (context) => TutorialToolNotifier(
           title: title,
-          showDontShowAgain: true,
+          showDontShowAgain: showDontShowAgain,
           child: child,
         ),
       );

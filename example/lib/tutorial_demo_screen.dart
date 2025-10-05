@@ -221,6 +221,7 @@ class _TutorialDemoScreenState extends State<TutorialDemoScreen> {
 
   Future<void> _showAdvancedDialog() async {
     await TutorialTool.showTutorialDialog(
+      showDontShowAgain: false,
       id: 'advanced_feature_dialog',
       buildContext: context,
       title: '高度な機能',

@@ -144,6 +144,7 @@ class MainScreen extends StatelessWidget {
             ElevatedButton.icon(
               onPressed: () async {
                 await TutorialTool.showTutorialDialog(
+                  showDontShowAgain: false,
                   id: 'welcome_dialog',
                   buildContext: context,
                   title: 'Welcome Dialog',
