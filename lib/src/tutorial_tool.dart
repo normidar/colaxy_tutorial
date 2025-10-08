@@ -9,6 +9,21 @@ import 'package:tutorial_coach_mark/tutorial_coach_mark.dart';
 class TutorialTool {
   static bool tutorialVisible = true;
 
+  /// Navigates to a tutorial page with horizontal scrolling.
+  ///
+  /// Displays a PageView with the provided [pages], a Skip button
+  /// in the top-right, and a Start button in the bottom-right on the last page.
+  static Future<void> jumpToTutorialPage({
+    required BuildContext buildContext,
+    required List<Widget> pages,
+  }) async {
+    await Navigator.of(buildContext).push(
+      MaterialPageRoute<void>(
+        builder: (context) => _TutorialPageView(pages: pages),
+      ),
+    );
+  }
+
   static Future<void> resetTutorial() async {
     final prefs = await SharedPreferences.getInstance();
     final showedIds = prefs.getStringList('$packageName:showed_ids') ?? [];
@@ -127,5 +142,113 @@ class TutorialTool {
       key,
       <String>{...ids, ...(prefs.getStringList(key) ?? [])}.toList(),
     );
+  }
+}
+
+/// Internal widget for displaying tutorial pages with navigation controls.
+class _TutorialPageView extends StatefulWidget {
+  const _TutorialPageView({required this.pages});
+
+  final List<Widget> pages;
+
+  @override
+  State<_TutorialPageView> createState() => _TutorialPageViewState();
+}
+
+class _TutorialPageViewState extends State<_TutorialPageView> {
+  late PageController _pageController;
+  int _currentPage = 0;
+
+  @override
+  Widget build(BuildContext context) {
+    final isLastPage = _currentPage == widget.pages.length - 1;
+
+    return Scaffold(
+      body: Stack(
+        children: [
+          // PageView with tutorial pages
+          PageView(
+            controller: _pageController,
+            onPageChanged: _onPageChanged,
+            children: widget.pages,
+          ),
+
+          // Skip button (top-right)
+          Positioned(
+            top: MediaQuery.of(context).padding.top + 16,
+            right: 16,
+            child: TextButton(
+              onPressed: _goBack,
+              style: TextButton.styleFrom(
+                backgroundColor: Colors.black.withValues(alpha: 0.3),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 16,
+                  vertical: 8,
+                ),
+              ),
+              child: Text(
+                '$packageName:skip'.tr(),
+                style: const TextStyle(
+                  color: Colors.white,
+                  fontSize: 16,
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+            ),
+          ),
+
+          // Start button (bottom-right, only on last page)
+          if (isLastPage)
+            Positioned(
+              bottom: MediaQuery.of(context).padding.bottom + 24,
+              right: 24,
+              child: ElevatedButton(
+                onPressed: _goBack,
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.blue,
+                  foregroundColor: Colors.white,
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 32,
+                    vertical: 16,
+                  ),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(30),
+                  ),
+                  elevation: 4,
+                ),
+                child: Text(
+                  '$packageName:start'.tr(),
+                  style: const TextStyle(
+                    fontSize: 18,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+              ),
+            ),
+        ],
+      ),
+    );
+  }
+
+  @override
+  void dispose() {
+    _pageController.dispose();
+    super.dispose();
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    _pageController = PageController();
+  }
+
+  void _goBack() {
+    Navigator.of(context).pop();
+  }
+
+  void _onPageChanged(int page) {
+    setState(() {
+      _currentPage = page;
+    });
   }
 }

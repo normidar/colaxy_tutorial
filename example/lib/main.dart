@@ -171,6 +171,54 @@ class MainScreen extends StatelessWidget {
             ),
             const SizedBox(height: 16),
             ElevatedButton.icon(
+              onPressed: () async {
+                await TutorialTool.jumpToTutorialPage(
+                  buildContext: context,
+                  pages: [
+                    _buildTutorialPage(
+                      context,
+                      icon: Icons.touch_app,
+                      title: 'Welcome to Tutorial',
+                      description:
+                          'Swipe left to see the next page.\nTap Skip to exit anytime.',
+                      color: Colors.blue.shade100,
+                    ),
+                    _buildTutorialPage(
+                      context,
+                      icon: Icons.favorite,
+                      title: 'Easy to Use',
+                      description:
+                          'Our tutorial system makes it easy to guide users through your app features.',
+                      color: Colors.pink.shade100,
+                    ),
+                    _buildTutorialPage(
+                      context,
+                      icon: Icons.settings,
+                      title: 'Customizable',
+                      description:
+                          'You can customize the appearance and behavior to match your app.',
+                      color: Colors.green.shade100,
+                    ),
+                    _buildTutorialPage(
+                      context,
+                      icon: Icons.rocket_launch,
+                      title: 'Get Started!',
+                      description:
+                          'This is the last page.\nClick the "Start" button below to begin!',
+                      color: Colors.purple.shade100,
+                    ),
+                  ],
+                );
+              },
+              icon: const Icon(Icons.book),
+              label: const Text('Open Tutorial Pages'),
+              style: ElevatedButton.styleFrom(
+                padding: const EdgeInsets.all(16),
+                textStyle: const TextStyle(fontSize: 18),
+              ),
+            ),
+            const SizedBox(height: 16),
+            ElevatedButton.icon(
               onPressed: () {
                 Navigator.push(
                   context,
@@ -187,6 +235,50 @@ class MainScreen extends StatelessWidget {
               ),
             ),
           ],
+        ),
+      ),
+    );
+  }
+
+  /// Helper method to build a tutorial page with consistent styling.
+  static Widget _buildTutorialPage(
+    BuildContext context, {
+    required IconData icon,
+    required String title,
+    required String description,
+    required Color color,
+  }) {
+    return Container(
+      color: color,
+      child: SafeArea(
+        child: Center(
+          child: Padding(
+            padding: const EdgeInsets.all(32.0),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Icon(icon, size: 120, color: Colors.black87),
+                const SizedBox(height: 40),
+                Text(
+                  title,
+                  style: Theme.of(context).textTheme.headlineMedium?.copyWith(
+                    fontWeight: FontWeight.bold,
+                    color: Colors.black87,
+                  ),
+                  textAlign: TextAlign.center,
+                ),
+                const SizedBox(height: 24),
+                Text(
+                  description,
+                  style: Theme.of(context).textTheme.bodyLarge?.copyWith(
+                    color: Colors.black87,
+                    fontSize: 18,
+                  ),
+                  textAlign: TextAlign.center,
+                ),
+              ],
+            ),
+          ),
         ),
       ),
     );
