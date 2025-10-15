@@ -14,14 +14,26 @@ class TutorialTool {
   /// Displays a PageView with the provided [pages], a Skip button
   /// in the top-right, and a Start button in the bottom-right on the last page.
   static Future<void> jumpToTutorialPage({
+    required String id,
     required BuildContext buildContext,
     required List<Widget> pages,
   }) async {
-    await Navigator.of(buildContext).push(
-      MaterialPageRoute<void>(
-        builder: (context) => _TutorialPageView(pages: pages),
-      ),
-    );
+    final key = '$packageName:$id';
+    final prefs = await SharedPreferences.getInstance();
+
+    final showed = prefs.getBool(key) ?? false;
+    if (showed) {
+      return;
+    }
+
+    if (buildContext.mounted) {
+      await Navigator.of(buildContext).push(
+        MaterialPageRoute<void>(
+          builder: (context) => _TutorialPageView(pages: pages),
+        ),
+      );
+      await _saveShowedIds([id]);
+    }
   }
 
   static Future<void> resetTutorial() async {

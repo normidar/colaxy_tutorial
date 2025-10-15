@@ -173,6 +173,7 @@ class MainScreen extends StatelessWidget {
             ElevatedButton.icon(
               onPressed: () async {
                 await TutorialTool.jumpToTutorialPage(
+                  id: 'tutorial_page',
                   buildContext: context,
                   pages: [
                     _buildTutorialPage(
