@@ -24,4 +24,4 @@ flutter:
     - assets/localizations/
 name: colaxy_tutorial
 repository: https://github.com/normidar/colaxy_tutorial
-version: 0.0.2
+version: 0.1.0
