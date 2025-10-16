@@ -26,24 +26,11 @@ class TutorialTool {
         final showed = prefs.getBool(key) ?? false;
         return showed;
       }(),
-      builder: (context, snapshot) {
-        final showed = snapshot.data;
-        switch (showed) {
-          case true:
-            return nextPage;
-          case false:
-            _saveShowedIds([id]);
-            return _TutorialPageView(
-              pages: pages,
-              nextPage: nextPage,
-            );
-          default:
-            return const Scaffold(
-              body: Center(
-                child: CircularProgressIndicator(),
-              ),
-            );
-        }
+      builder: (context, snapshot) => switch (snapshot.data) {
+        true => nextPage,
+        false => _TutorialPageView(pages: pages, nextPage: nextPage, id: id),
+        null =>
+          const Scaffold(body: Center(child: CircularProgressIndicator())),
       },
     );
   }
@@ -68,10 +55,10 @@ class TutorialTool {
     if (buildContext.mounted) {
       await Navigator.of(buildContext).push(
         MaterialPageRoute<void>(
-          builder: (context) => _TutorialPageView(pages: pages, nextPage: null),
+          builder: (context) =>
+              _TutorialPageView(pages: pages, nextPage: null, id: id),
         ),
       );
-      await _saveShowedIds([id]);
     }
   }
 
@@ -81,6 +68,18 @@ class TutorialTool {
     for (final id in showedIds) {
       await prefs.remove('$packageName:$id');
     }
+  }
+
+  static Future<void> saveShowedIds(List<String> ids) async {
+    final prefs = await SharedPreferences.getInstance();
+    for (final id in ids) {
+      await prefs.setBool('$packageName:$id', true);
+    }
+    const key = '$packageName:showed_ids';
+    await prefs.setStringList(
+      key,
+      <String>{...ids, ...(prefs.getStringList(key) ?? [])}.toList(),
+    );
   }
 
   static Future<void> showTutorial({
@@ -145,7 +144,7 @@ class TutorialTool {
     Future.delayed(const Duration(milliseconds: 300), () async {
       if (buildContext.mounted) {
         tutorialCoachMark.show(context: buildContext);
-        await _saveShowedIds(toShowIds);
+        await saveShowedIds(toShowIds);
       }
     });
   }
@@ -178,31 +177,25 @@ class TutorialTool {
         ),
       );
       if (dontShowAgain ?? false) {
-        await _saveShowedIds([id]);
+        await saveShowedIds([id]);
       }
     }
-  }
-
-  static Future<void> _saveShowedIds(List<String> ids) async {
-    final prefs = await SharedPreferences.getInstance();
-    for (final id in ids) {
-      await prefs.setBool('$packageName:$id', true);
-    }
-    const key = '$packageName:showed_ids';
-    await prefs.setStringList(
-      key,
-      <String>{...ids, ...(prefs.getStringList(key) ?? [])}.toList(),
-    );
   }
 }
 
 /// Internal widget for displaying tutorial pages with navigation controls.
 class _TutorialPageView extends StatefulWidget {
-  const _TutorialPageView({required this.pages, required this.nextPage});
+  const _TutorialPageView({
+    required this.pages,
+    required this.nextPage,
+    required this.id,
+  });
 
   final List<Widget> pages;
 
   final Widget? nextPage;
+
+  final String id;
 
   @override
   State<_TutorialPageView> createState() => _TutorialPageViewState();
@@ -296,6 +289,7 @@ class _TutorialPageViewState extends State<_TutorialPageView> {
   }
 
   void _finish() {
+    TutorialTool.saveShowedIds([widget.id]);
     final nextPage = widget.nextPage;
     if (nextPage != null) {
       Navigator.of(context).pushReplacement(
