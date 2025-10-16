@@ -6,7 +6,9 @@ import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:tutorial_coach_mark/tutorial_coach_mark.dart';
 
+/// Main utility class for managing tutorial functionality.
 class TutorialTool {
+  /// Controls whether tutorials should be visible globally.
   static bool tutorialVisible = true;
 
   /// Guard a tutorial page.
@@ -62,6 +64,7 @@ class TutorialTool {
     }
   }
 
+  /// Resets all tutorial states, allowing them to be shown again.
   static Future<void> resetTutorial() async {
     final prefs = await SharedPreferences.getInstance();
     final showedIds = prefs.getStringList('$packageName:showed_ids') ?? [];
@@ -70,6 +73,7 @@ class TutorialTool {
     }
   }
 
+  /// Saves the list of tutorial IDs that have been shown.
   static Future<void> saveShowedIds(List<String> ids) async {
     final prefs = await SharedPreferences.getInstance();
     for (final id in ids) {
@@ -82,6 +86,7 @@ class TutorialTool {
     );
   }
 
+  /// Shows a tutorial with the specified data sets.
   static Future<void> showTutorial({
     required List<TutorialDataSet> dataSets,
     required BuildContext buildContext,

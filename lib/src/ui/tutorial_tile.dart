@@ -6,7 +6,9 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 // tutorial_tile
 
+/// A list tile widget that navigates to the tutorial settings page.
 class TutorialTile extends ConsumerWidget {
+  /// Creates a tutorial tile widget.
   const TutorialTile({super.key});
 
   @override

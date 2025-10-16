@@ -2,7 +2,9 @@ import 'package:colaxy_tutorial/colaxy_tutorial.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 
+/// A settings page that allows users to reset tutorial state.
 class TutorialSettingsPage extends StatelessWidget {
+  /// Creates a tutorial settings page.
   const TutorialSettingsPage({super.key});
 
   @override
