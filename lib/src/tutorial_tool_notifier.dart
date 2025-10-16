@@ -2,7 +2,10 @@ import 'package:colaxy_tutorial/colaxy_tutorial.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 
+/// A dialog widget that notifies users about tutorials with optional
+/// "don't show again" functionality.
 class TutorialToolNotifier extends StatefulWidget {
+  /// Creates a tutorial tool notifier dialog.
   const TutorialToolNotifier({
     required this.title,
     required this.child,
@@ -10,10 +13,13 @@ class TutorialToolNotifier extends StatefulWidget {
     super.key,
   });
 
+  /// The title text for the dialog.
   final String title;
 
+  /// The child widget to display in the dialog content.
   final Widget child;
 
+  /// Whether to show the "don't show again" checkbox.
   final bool showDontShowAgain;
 
   @override

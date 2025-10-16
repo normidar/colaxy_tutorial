@@ -6,8 +6,36 @@ import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:tutorial_coach_mark/tutorial_coach_mark.dart';
 
+/// Main utility class for managing tutorial functionality.
 class TutorialTool {
+  /// Controls whether tutorials should be visible globally.
   static bool tutorialVisible = true;
+
+  /// Guard a tutorial page.
+  ///
+  /// If the tutorial page has been shown, return the [nextPage].
+  /// If the tutorial page has not been shown,
+  ///   show the tutorial page and return [nextPage] if it is not null.
+  static Widget guardTutorialPage({
+    required String id,
+    required List<Widget> pages,
+    required Widget nextPage,
+  }) {
+    return FutureBuilder<bool>(
+      future: () async {
+        final key = '$packageName:$id';
+        final prefs = await SharedPreferences.getInstance();
+        final showed = prefs.getBool(key) ?? false;
+        return showed;
+      }(),
+      builder: (context, snapshot) => switch (snapshot.data) {
+        true => nextPage,
+        false => _TutorialPageView(pages: pages, nextPage: nextPage, id: id),
+        null =>
+          const Scaffold(body: Center(child: CircularProgressIndicator())),
+      },
+    );
+  }
 
   /// Navigates to a tutorial page with horizontal scrolling.
   ///
@@ -29,13 +57,14 @@ class TutorialTool {
     if (buildContext.mounted) {
       await Navigator.of(buildContext).push(
         MaterialPageRoute<void>(
-          builder: (context) => _TutorialPageView(pages: pages),
+          builder: (context) =>
+              _TutorialPageView(pages: pages, nextPage: null, id: id),
         ),
       );
-      await _saveShowedIds([id]);
     }
   }
 
+  /// Resets all tutorial states, allowing them to be shown again.
   static Future<void> resetTutorial() async {
     final prefs = await SharedPreferences.getInstance();
     final showedIds = prefs.getStringList('$packageName:showed_ids') ?? [];
@@ -44,6 +73,20 @@ class TutorialTool {
     }
   }
 
+  /// Saves the list of tutorial IDs that have been shown.
+  static Future<void> saveShowedIds(List<String> ids) async {
+    final prefs = await SharedPreferences.getInstance();
+    for (final id in ids) {
+      await prefs.setBool('$packageName:$id', true);
+    }
+    const key = '$packageName:showed_ids';
+    await prefs.setStringList(
+      key,
+      <String>{...ids, ...(prefs.getStringList(key) ?? [])}.toList(),
+    );
+  }
+
+  /// Shows a tutorial with the specified data sets.
   static Future<void> showTutorial({
     required List<TutorialDataSet> dataSets,
     required BuildContext buildContext,
@@ -106,7 +149,7 @@ class TutorialTool {
     Future.delayed(const Duration(milliseconds: 300), () async {
       if (buildContext.mounted) {
         tutorialCoachMark.show(context: buildContext);
-        await _saveShowedIds(toShowIds);
+        await saveShowedIds(toShowIds);
       }
     });
   }
@@ -139,29 +182,25 @@ class TutorialTool {
         ),
       );
       if (dontShowAgain ?? false) {
-        await _saveShowedIds([id]);
+        await saveShowedIds([id]);
       }
     }
-  }
-
-  static Future<void> _saveShowedIds(List<String> ids) async {
-    final prefs = await SharedPreferences.getInstance();
-    for (final id in ids) {
-      await prefs.setBool('$packageName:$id', true);
-    }
-    const key = '$packageName:showed_ids';
-    await prefs.setStringList(
-      key,
-      <String>{...ids, ...(prefs.getStringList(key) ?? [])}.toList(),
-    );
   }
 }
 
 /// Internal widget for displaying tutorial pages with navigation controls.
 class _TutorialPageView extends StatefulWidget {
-  const _TutorialPageView({required this.pages});
+  const _TutorialPageView({
+    required this.pages,
+    required this.nextPage,
+    required this.id,
+  });
 
   final List<Widget> pages;
+
+  final Widget? nextPage;
+
+  final String id;
 
   @override
   State<_TutorialPageView> createState() => _TutorialPageViewState();
@@ -190,7 +229,7 @@ class _TutorialPageViewState extends State<_TutorialPageView> {
             top: MediaQuery.of(context).padding.top + 16,
             right: 16,
             child: TextButton(
-              onPressed: _goBack,
+              onPressed: _finish,
               style: TextButton.styleFrom(
                 backgroundColor: Colors.black.withValues(alpha: 0.3),
                 padding: const EdgeInsets.symmetric(
@@ -215,7 +254,7 @@ class _TutorialPageViewState extends State<_TutorialPageView> {
               bottom: MediaQuery.of(context).padding.bottom + 24,
               right: 24,
               child: ElevatedButton(
-                onPressed: _goBack,
+                onPressed: _finish,
                 style: ElevatedButton.styleFrom(
                   backgroundColor: Colors.blue,
                   foregroundColor: Colors.white,
@@ -254,7 +293,17 @@ class _TutorialPageViewState extends State<_TutorialPageView> {
     _pageController = PageController();
   }
 
-  void _goBack() {
+  void _finish() {
+    TutorialTool.saveShowedIds([widget.id]);
+    final nextPage = widget.nextPage;
+    if (nextPage != null) {
+      Navigator.of(context).pushReplacement(
+        MaterialPageRoute<void>(
+          builder: (context) => nextPage,
+        ),
+      );
+      return;
+    }
     Navigator.of(context).pop();
   }
 

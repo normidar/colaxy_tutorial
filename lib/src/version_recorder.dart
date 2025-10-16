@@ -1,7 +1,9 @@
 import 'package:package_info_plus/package_info_plus.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+/// Utility class for recording and checking tutorial version history.
 class VersionRecorder {
+  /// The key used to store recorded versions in SharedPreferences.
   static const key = 'tutorial_versions_recorded';
 
   /// バージョン確認 全てtrueならtrue

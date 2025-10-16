@@ -1,13 +1,18 @@
 import 'package:flutter/material.dart';
 
+/// A widget that displays tutorial content with title and description.
 class TutorialContent extends StatelessWidget {
+  /// Creates a tutorial content widget.
   const TutorialContent({
     required this.title,
     required this.description,
     super.key,
   });
 
+  /// The title text to display.
   final String title;
+
+  /// The description text to display.
   final String description;
 
   @override

@@ -1,3 +1,7 @@
+## 0.1.1
+
+- Add guardTutorialPage method.
+
 ## 0.1.0
 
 - Add Tutorial Page feature.

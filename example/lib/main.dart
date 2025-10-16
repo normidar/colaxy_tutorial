@@ -68,6 +68,105 @@ class FeatureItem extends StatelessWidget {
   }
 }
 
+/// A page that is guarded by a tutorial.
+/// This page will only be shown after the tutorial is completed.
+class GuardedPage extends StatelessWidget {
+  const GuardedPage({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text('Guarded Page'),
+        backgroundColor: Colors.green.shade100,
+        elevation: 2,
+      ),
+      body: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            Card(
+              child: Padding(
+                padding: const EdgeInsets.all(16.0),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Row(
+                      children: [
+                        Icon(Icons.check_circle, color: Colors.green, size: 32),
+                        const SizedBox(width: 12),
+                        Expanded(
+                          child: Text(
+                            'Tutorial Completed!',
+                            style: Theme.of(context).textTheme.headlineSmall
+                                ?.copyWith(
+                                  color: Colors.green,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                          ),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 16),
+                    const Text(
+                      'Congratulations! You have successfully completed the guarded page tutorial.\n\n'
+                      'This demonstrates the guardTutorialPage functionality:\n'
+                      '• The tutorial was shown only once\n'
+                      '• After completion, you were automatically taken to this page\n'
+                      '• If you navigate back and try again, you\'ll go directly here\n'
+                      '• The tutorial won\'t show again unless you reset the tutorial data',
+                      style: TextStyle(fontSize: 16),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+            const SizedBox(height: 24),
+            ElevatedButton.icon(
+              onPressed: () {
+                Navigator.pop(context);
+              },
+              icon: const Icon(Icons.arrow_back),
+              label: const Text('Back to Main'),
+              style: ElevatedButton.styleFrom(
+                padding: const EdgeInsets.all(16),
+                textStyle: const TextStyle(fontSize: 18),
+                backgroundColor: Colors.blue,
+                foregroundColor: Colors.white,
+              ),
+            ),
+            const SizedBox(height: 16),
+            ElevatedButton.icon(
+              onPressed: () async {
+                await TutorialTool.resetTutorial();
+                if (context.mounted) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(
+                      content: Text(
+                        'Tutorial data has been reset. Try the guarded page again!',
+                      ),
+                      backgroundColor: Colors.green,
+                    ),
+                  );
+                }
+              },
+              icon: const Icon(Icons.refresh),
+              label: const Text('Reset Tutorial Data'),
+              style: ElevatedButton.styleFrom(
+                padding: const EdgeInsets.all(16),
+                textStyle: const TextStyle(fontSize: 18),
+                backgroundColor: Colors.orange,
+                foregroundColor: Colors.white,
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
 class MainApp extends StatelessWidget {
   const MainApp({super.key});
 
@@ -230,6 +329,52 @@ class MainScreen extends StatelessWidget {
               },
               icon: const Icon(Icons.settings),
               label: const Text('Tutorial Settings'),
+              style: ElevatedButton.styleFrom(
+                padding: const EdgeInsets.all(16),
+                textStyle: const TextStyle(fontSize: 18),
+              ),
+            ),
+            const SizedBox(height: 16),
+            ElevatedButton.icon(
+              onPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => TutorialTool.guardTutorialPage(
+                      id: 'guarded_page_tutorial',
+                      pages: [
+                        _buildTutorialPage(
+                          context,
+                          icon: Icons.security,
+                          title: 'Guarded Page Tutorial',
+                          description:
+                              'This page is protected by a tutorial.\nYou\'ll see this tutorial only once.',
+                          color: Colors.orange.shade100,
+                        ),
+                        _buildTutorialPage(
+                          context,
+                          icon: Icons.lock,
+                          title: 'One-Time Tutorial',
+                          description:
+                              'After completing this tutorial,\nyou\'ll go directly to the guarded page.',
+                          color: Colors.red.shade100,
+                        ),
+                        _buildTutorialPage(
+                          context,
+                          icon: Icons.check_circle,
+                          title: 'Ready to Continue',
+                          description:
+                              'Tap "Start" to proceed to the guarded page.\nThis tutorial won\'t show again.',
+                          color: Colors.teal.shade100,
+                        ),
+                      ],
+                      nextPage: const GuardedPage(),
+                    ),
+                  ),
+                );
+              },
+              icon: const Icon(Icons.security),
+              label: const Text('Guarded Page Demo'),
               style: ElevatedButton.styleFrom(
                 padding: const EdgeInsets.all(16),
                 textStyle: const TextStyle(fontSize: 18),
