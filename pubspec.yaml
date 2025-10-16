@@ -5,10 +5,10 @@ dependencies:
   flutter:
     sdk: flutter
   flutter_riverpod: ^2.6.1
-  package_info_plus: ^8.1.1
+  package_info_plus: ^9.0.0
   shared_preferences: ^2.2.3
   tutorial_coach_mark: ^1.2.12
-description: "A tool for showing tutorials."
+description: "A tool for showing tutorials, developed on tutorial_coach_mark, more easier to use, more features."
 dev_dependencies:
   auto_exporter: any
   build_runner: ^2.4.11

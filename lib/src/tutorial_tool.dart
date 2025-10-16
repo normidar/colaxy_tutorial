@@ -9,6 +9,45 @@ import 'package:tutorial_coach_mark/tutorial_coach_mark.dart';
 class TutorialTool {
   static bool tutorialVisible = true;
 
+  /// Guard a tutorial page.
+  ///
+  /// If the tutorial page has been shown, return the [nextPage].
+  /// If the tutorial page has not been shown,
+  ///   show the tutorial page and return [nextPage] if it is not null.
+  static Widget guardTutorialPage({
+    required String id,
+    required List<Widget> pages,
+    required Widget nextPage,
+  }) {
+    return FutureBuilder<bool>(
+      future: () async {
+        final key = '$packageName:$id';
+        final prefs = await SharedPreferences.getInstance();
+        final showed = prefs.getBool(key) ?? false;
+        return showed;
+      }(),
+      builder: (context, snapshot) {
+        final showed = snapshot.data;
+        switch (showed) {
+          case true:
+            return nextPage;
+          case false:
+            _saveShowedIds([id]);
+            return _TutorialPageView(
+              pages: pages,
+              nextPage: nextPage,
+            );
+          default:
+            return const Scaffold(
+              body: Center(
+                child: CircularProgressIndicator(),
+              ),
+            );
+        }
+      },
+    );
+  }
+
   /// Navigates to a tutorial page with horizontal scrolling.
   ///
   /// Displays a PageView with the provided [pages], a Skip button
@@ -29,7 +68,7 @@ class TutorialTool {
     if (buildContext.mounted) {
       await Navigator.of(buildContext).push(
         MaterialPageRoute<void>(
-          builder: (context) => _TutorialPageView(pages: pages),
+          builder: (context) => _TutorialPageView(pages: pages, nextPage: null),
         ),
       );
       await _saveShowedIds([id]);
@@ -159,9 +198,11 @@ class TutorialTool {
 
 /// Internal widget for displaying tutorial pages with navigation controls.
 class _TutorialPageView extends StatefulWidget {
-  const _TutorialPageView({required this.pages});
+  const _TutorialPageView({required this.pages, required this.nextPage});
 
   final List<Widget> pages;
+
+  final Widget? nextPage;
 
   @override
   State<_TutorialPageView> createState() => _TutorialPageViewState();
@@ -190,7 +231,7 @@ class _TutorialPageViewState extends State<_TutorialPageView> {
             top: MediaQuery.of(context).padding.top + 16,
             right: 16,
             child: TextButton(
-              onPressed: _goBack,
+              onPressed: _finish,
               style: TextButton.styleFrom(
                 backgroundColor: Colors.black.withValues(alpha: 0.3),
                 padding: const EdgeInsets.symmetric(
@@ -215,7 +256,7 @@ class _TutorialPageViewState extends State<_TutorialPageView> {
               bottom: MediaQuery.of(context).padding.bottom + 24,
               right: 24,
               child: ElevatedButton(
-                onPressed: _goBack,
+                onPressed: _finish,
                 style: ElevatedButton.styleFrom(
                   backgroundColor: Colors.blue,
                   foregroundColor: Colors.white,
@@ -254,7 +295,16 @@ class _TutorialPageViewState extends State<_TutorialPageView> {
     _pageController = PageController();
   }
 
-  void _goBack() {
+  void _finish() {
+    final nextPage = widget.nextPage;
+    if (nextPage != null) {
+      Navigator.of(context).pushReplacement(
+        MaterialPageRoute<void>(
+          builder: (context) => nextPage,
+        ),
+      );
+      return;
+    }
     Navigator.of(context).pop();
   }
 
