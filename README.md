@@ -3,7 +3,7 @@
 [![GitHub](https://img.shields.io/github/license/normidar/colaxy_tutorial.svg)](https://github.com/normidar/colaxy_tutorial/blob/main/LICENSE)
 [![pub package](https://img.shields.io/pub/v/colaxy_tutorial.svg)](https://pub.dartlang.org/packages/colaxy_tutorial)
 [![GitHub Stars](https://img.shields.io/github/stars/normidar/colaxy_tutorial.svg)](https://github.com/normidar/colaxy_tutorial/stargazers)
-[![Twitter](https://img.shields.io/twitter/url/https/twitter.com/normidar.svg?style=social&label=Follow%20%40normidar)](https://twitter.com/normidar)
+[![Twitter](https://img.shields.io/twitter/url/https/twitter.com/normidar2.svg?style=social&label=Follow%20%40normidar2)](https://twitter.com/normidar2)
 [![Github-sponsors](https://img.shields.io/badge/sponsor-30363D?logo=GitHub-Sponsors&logoColor=#EA4AAA)](https://github.com/sponsors/normidar)
 
 A powerful and flexible Flutter package for creating interactive tutorials, onboarding flows, and contextual hints in your Flutter applications. Built with version tracking capabilities and user preference management.
@@ -16,7 +16,9 @@ A powerful and flexible Flutter package for creating interactive tutorials, onbo
 💾 **Persistent Storage**: Remember user preferences and tutorial completion status  
 🎨 **Customizable UI**: Flexible styling options for tutorial content and appearance  
 ⚙️ **Settings Management**: Built-in settings page for tutorial management  
-🌐 **Localization Ready**: Full support for internationalization with easy_localization
+🌐 **Localization Ready**: Full support for internationalization with easy_localization  
+🛡️ **Guarded Pages**: Protect pages with one-time tutorials  
+📄 **Tutorial Pages**: Create multi-page tutorial flows with navigation
 
 ## Installation
 
@@ -24,7 +26,7 @@ Add this to your package's `pubspec.yaml` file:
 
 ```yaml
 dependencies:
-  colaxy_tutorial: ^0.0.1
+  colaxy_tutorial: ^0.1.1
 ```
 
 Run `flutter pub get` to install the package.
@@ -57,12 +59,61 @@ await TutorialTool.showTutorial(
 ### Dialog-Based Hints
 
 ```dart
-await TutorialTool.showColaxyDialog(
+await TutorialTool.showTutorialDialog(
   id: 'new_feature_hint',
   buildContext: context,
   title: 'New Feature',
   child: Text('Check out this amazing new feature!'),
-  anyChecker: (version) => version == '1.0.0', // Show only to v1.0.0 users
+  showDontShowAgain: true, // Show "Don't show again" option
+);
+```
+
+### Tutorial Pages
+
+```dart
+await TutorialTool.jumpToTutorialPage(
+  id: 'onboarding_tutorial',
+  buildContext: context,
+  pages: [
+    _buildTutorialPage(
+      context,
+      icon: Icons.welcome,
+      title: 'Welcome!',
+      description: 'This is the first page of your tutorial.',
+      color: Colors.blue.shade100,
+    ),
+    _buildTutorialPage(
+      context,
+      icon: Icons.star,
+      title: 'Get Started',
+      description: 'Learn how to use our amazing features.',
+      color: Colors.green.shade100,
+    ),
+  ],
+);
+```
+
+### Guarded Pages
+
+```dart
+// Navigate to a page that shows tutorial only once
+Navigator.push(
+  context,
+  MaterialPageRoute(
+    builder: (context) => TutorialTool.guardTutorialPage(
+      id: 'feature_tutorial',
+      pages: [
+        _buildTutorialPage(
+          context,
+          icon: Icons.lock,
+          title: 'Protected Feature',
+          description: 'This feature requires a tutorial first.',
+          color: Colors.orange.shade100,
+        ),
+      ],
+      nextPage: const ProtectedFeaturePage(),
+    ),
+  ),
 );
 ```
 
@@ -102,23 +153,26 @@ Track app versions and show tutorials conditionally:
 // Record current app version
 await VersionRecorder.recordVersion();
 
-// Show tutorial only if user has used version 2.0.0
-await TutorialTool.showColaxyDialog(
-  id: 'migration_help',
-  buildContext: context,
-  title: 'App Updated',
-  child: Text('Here are the new changes...'),
-  anyChecker: (version) => version == '2.0.0',
+// Check if user has used specific versions
+bool hasUsedVersion = await VersionRecorder.isRecordedVersionOr(
+  checker: (version) => version == '2.0.0',
 );
 
-// Show tutorial only if user has used ALL specified versions
-await TutorialTool.showColaxyDialog(
-  id: 'advanced_feature',
-  buildContext: context,
-  title: 'Advanced Feature',
-  child: Text('You are an experienced user!'),
-  everyChecker: (version) => ['1.0.0', '1.1.0'].contains(version),
+// Check if user has used ALL specified versions
+bool hasUsedAllVersions = await VersionRecorder.isRecordedVersionAnd(
+  checker: (version) => ['1.0.0', '1.1.0'].contains(version),
 );
+
+// Show tutorial based on version history
+if (hasUsedVersion) {
+  await TutorialTool.showTutorialDialog(
+    id: 'migration_help',
+    buildContext: context,
+    title: 'App Updated',
+    child: Text('Here are the new changes...'),
+    showDontShowAgain: true,
+  );
+}
 ```
 
 ## UI Components
@@ -137,13 +191,13 @@ Navigator.push(
 );
 ```
 
-### Tutorial Tile
+### Tutorial Reset Tile
 
 Add a settings tile to your app:
 
 ```dart
 // In your settings list
-TutorialTile(), // Automatically navigates to TutorialSettingsPage
+TutorialResetTile(), // Automatically navigates to TutorialSettingsPage
 ```
 
 ## Advanced Usage
@@ -151,12 +205,16 @@ TutorialTile(), // Automatically navigates to TutorialSettingsPage
 ### Force Show Tutorials
 
 ```dart
-await TutorialTool.showColaxyDialog(
+// Reset specific tutorial to show again
+await TutorialTool.resetTutorial();
+
+// Or show dialog without "Don't show again" option
+await TutorialTool.showTutorialDialog(
   id: 'important_update',
   buildContext: context,
   title: 'Important Update',
   child: Text('Critical information...'),
-  forceShow: true, // Always show, regardless of previous completion
+  showDontShowAgain: false, // No "Don't show again" option
 );
 ```
 
@@ -167,13 +225,21 @@ await TutorialTool.showColaxyDialog(
 await TutorialTool.resetTutorial();
 ```
 
-### Check First-Time Usage
+### Tutorial Content Widget
+
+Use the built-in `TutorialContent` widget for consistent styling:
 
 ```dart
-bool isFirstTime = await TutorialTool.isFirstTime('feature_id');
-if (isFirstTime) {
-  // Show first-time user tutorial
-}
+TutorialDataSet(
+  id: 'welcome_tutorial',
+  key: _welcomeKey,
+  align: TutorialAlign.bottom,
+  shape: TutorialShape.circle,
+  builder: (context) => const TutorialContent(
+    title: 'Welcome!',
+    description: 'This is a tutorial step with consistent styling.',
+  ),
+)
 ```
 
 ## Localization Support
@@ -182,15 +248,16 @@ The package uses `easy_localization` for internationalization. Add these keys to
 
 ```json
 {
-  "tutorial:skip": "Skip",
-  "tutorial:dont_show_again": "Don't show again",
-  "tutorial:understood": "Got it",
-  "tutorial:settings_page_title": "Tutorial Settings",
-  "tutorial:reset_tutorial": "Reset all tutorials",
-  "tutorial:reset": "Reset",
-  "tutorial:reset_successful": "Successfully reset",
-  "tutorial:ok": "OK",
-  "tile_title": "Tutorial Settings"
+  "colaxy_tutorial:skip": "Skip",
+  "colaxy_tutorial:dont_show_again": "Don't show again",
+  "colaxy_tutorial:understood": "Got it",
+  "colaxy_tutorial:settings_page_title": "Tutorial Settings",
+  "colaxy_tutorial:reset_tutorial": "Reset all tutorials",
+  "colaxy_tutorial:reset": "Reset",
+  "colaxy_tutorial:reset_successful": "Successfully reset",
+  "colaxy_tutorial:ok": "OK",
+  "colaxy_tutorial:start": "Start",
+  "colaxy_tutorial:tile_title": "Tutorial Settings"
 }
 ```
 
@@ -201,7 +268,7 @@ This package depends on:
 - `flutter`: SDK
 - `tutorial_coach_mark`: ^1.2.12 - Core tutorial functionality
 - `shared_preferences`: ^2.2.3 - Persistent storage
-- `package_info_plus`: ^8.1.1 - App version information
+- `package_info_plus`: ^9.0.0 - App version information
 - `easy_localization`: ^3.0.7 - Internationalization
 - `flutter_riverpod`: ^2.6.1 - State management
 - `app_lang_selector`: ^0.0.1 - Language selection
