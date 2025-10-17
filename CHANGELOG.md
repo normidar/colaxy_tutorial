@@ -1,3 +1,7 @@
+## 0.2.0
+
+- Add TutorialResetTile component.
+
 ## 0.1.1
 
 - Add guardTutorialPage method.
