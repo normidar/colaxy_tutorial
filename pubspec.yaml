@@ -8,7 +8,7 @@ dependencies:
   package_info_plus: ^9.0.0
   shared_preferences: ^2.2.3
   tutorial_coach_mark: ^1.2.12
-description: "A tool for showing tutorials, developed on tutorial_coach_mark, more easier to use, more features."
+description: A tool for showing tutorials, developed on tutorial_coach_mark, more easier to use, more features.
 dev_dependencies:
   auto_exporter: any
   build_runner: ^2.4.11
@@ -17,11 +17,17 @@ dev_dependencies:
     sdk: flutter
   very_good_analysis: any
 environment:
-  flutter: ">=1.17.0"
-  sdk: ">=3.4.0 <4.0.0"
+  flutter: '>=1.17.0'
+  sdk: '>=3.4.0 <4.0.0'
 flutter:
   assets:
     - assets/localizations/
 name: colaxy_tutorial
 repository: https://github.com/normidar/colaxy_tutorial
-version: 0.1.1
+topics:
+  - tutorial
+  - tutorial-coach-mark
+  - manual
+  - guide
+  - startup
+version: 0.2.0
