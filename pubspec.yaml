@@ -12,7 +12,7 @@ description: A tool for showing tutorials, developed on tutorial_coach_mark, mor
 dev_dependencies:
   auto_exporter: any
   build_runner: ^2.4.11
-  flutter_lints: ^4.0.0
+  flutter_lints: ">=4.0.0 <7.0.0"
   flutter_test:
     sdk: flutter
   very_good_analysis: any
