@@ -1,3 +1,7 @@
+## 0.3.0
+
+- Update riverpod dependency to 3.0.0.
+
 ## 0.2.0
 
 - Add TutorialResetTile component.
